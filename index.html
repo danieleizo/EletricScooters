@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Scooters in NYC</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- import the webpage's stylesheet -->
+    <link rel="stylesheet" href="/style.css">    
+        <!-- Load Leaflet CSS -->
+    <link href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css" rel="stylesheet">
+<!--   Google Fonts   -->
+    <link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono:400,400i|IBM+Plex+Sans+Condensed:400,400i|IBM+Plex+Sans:100,100i,400,400i,700,700i|IBM+Plex+Serif:400,400i" rel="stylesheet">
+    
+  </head>  
+  
+  <body>
+<!--     map -->
+    <div id="map"></div>
+    
+        <!--
+      This script element will not be displayed, it just holds our template
+    -->
+    <script class="popup-template" type="x-tmpl-mustache">
+      <div>
+        <h2>{{complaint_type}}</h2>
+        <div class="address">{{incident_address}}</div>
+        <div>{{descriptor}}</div>
+        <div>{{agency}}</div>
+      </div>
+    </script>
+        
+    <!--     Sidebar -->
+    <div class="sideBar">
+      <h1><em><strong>Eletric Scooters</strong></em></h1>
+      <h2>
+         Micromobility New York City
+      </h2>
+      
+      <!--     buttons -->
+      <div class="overlay">
+        <button class="funny">
+          <strong>Take me somewhere funny</strong>
+        </button>
+      </div>
+      
+      <div class="overlay">
+        <select class="names">
+          <option value= ""> Pick a Station </option>
+          <option value="103rd St">103rd St  - Line 1</option>
+          <option value="103rd St">103rd St  - Line 4-6-6 Express</option>
+          <option value="103rd St">103rd St  - Line A-B-C</option>
+          <option value="103rd St - Corona Plaza">103rd St - Corona Plaza  - Line 7</option>
+          <option value="104th St">104th St  - Line A-S</option>
+          <option value="104th-102nd Sts">104th-102nd Sts  - Line J-Z</option>
+          <option value="110th St">110th St  - Line 4-6-6 Express</option>
+          <option value="111th St">111th St  - Line 7</option>
+          <option value="111th St">111th St  - Line A-S</option>
+          <option value="111th St">111th St  - Line J</option>
+          <option value="116th St">116th St  - Line 43526</option>
+          <option value="116th St">116th St  - Line 4-6-6 Express</option>
+          <option value="116th St">116th St  - Line A-B-C</option>
+          <option value="116th St - Columbia University">116th St - Columbia University  - Line 1</option>
+          <option value="121st St">121st St  - Line J-Z</option>
+          <option value="125th St">125th St  - Line 1</option>
+          <option value="125th St">125th St  - Line 43526</option>
+          <option value="125th St">125th St  - Line 4-5-6-6 Express</option>
+          <option value="125th St">125th St  - Line A-B-C-D</option>
+          <option value="135th St">135th St  - Line 43526</option>
+          <option value="135th St">135th St  - Line A-B-C</option>
+          <option value="137th St - City College">137th St - City College  - Line 1</option>
+          <option value="138th St - Grand Concourse">138th St - Grand Concourse  - Line 43589</option>
+          <option value="145th St">145th St  - Line 1</option>
+          <option value="145th St">145th St  - Line 3</option>
+          <option value="145th St">145th St  - Line A-B-C-D</option>
+          <option value="149th St - Grand Concourse">149th St - Grand Concourse  - Line 4</option>
+          <option value="149th St - Grand Concourse">149th St - Grand Concourse  - Line 43587</option>
+          <option value="14th St">14th St  - Line 37653</option>
+          <option value="14th St">14th St  - Line A-C-E</option>
+          <option value="14th St">14th St  - Line F-M</option>
+          <option value="155th St">155th St  - Line A-C</option>
+          <option value="155th St">155th St  - Line B-D</option>
+          <option value="157th St">157th St  - Line 1</option>
+          <option value="15th St - Prospect Park">15th St - Prospect Park  - Line F-G</option>
+          <option value="161st St - Yankee Stadium">161st St - Yankee Stadium  - Line 4</option>
+          <option value="161st St - Yankee Stadium">161st St - Yankee Stadium  - Line B-D</option>
+          <option value="163rd St - Amsterdam Av">163rd St - Amsterdam Av  - Line A-C</option>
+          <option value="167th St">167th St  - Line 4</option>
+          <option value="167th St">167th St  - Line B-D</option>
+          <option value="168th St">168th St  - Line 1</option>
+          <option value="168th St">168th St  - Line A-C</option>
+          <option value="169th St">169th St  - Line F</option>
+          <option value="170th St">170th St  - Line 4</option>
+          <option value="170th St">170th St  - Line B-D</option>
+          <option value="174th St">174th St  - Line 43587</option>
+          <option value="174th-175th Sts">174th-175th Sts  - Line B-D</option>
+          <option value="175th St">175th St  - Line A</option>
+          <option value="176th St">176th St  - Line 4</option>
+          <option value="181st St">181st St  - Line 1</option>
+          <option value="181st St">181st St  - Line A</option>
+          <option value="182nd-183rd Sts">182nd-183rd Sts  - Line B-D</option>
+          <option value="183rd St">183rd St  - Line 4</option>
+          <option value="18th Ave">18th Ave  - Line D</option>
+          <option value="18th Ave">18th Ave  - Line F</option>
+          <option value="18th Ave">18th Ave  - Line N</option>
+          <option value="18th St">18th St  - Line 43497</option>
+          <option value="190th St">190th St  - Line A</option>
+          <option value="191st St">191st St  - Line 1</option>
+          <option value="1st Ave">1st Ave  - Line L</option>
+          <option value="207th St">207th St  - Line 1</option>
+          <option value="20th Ave">20th Ave  - Line D</option>
+          <option value="20th Ave">20th Ave  - Line N</option>
+          <option value="215th St">215th St  - Line 1</option>
+          <option value="219th St">219th St  - Line 43587</option>
+          <option value="21st St">21st St  - Line G</option>
+          <option value="21st St - Queensbridge">21st St - Queensbridge  - Line F</option>
+          <option value="225th St">225th St  - Line 43587</option>
+          <option value="231st St">231st St  - Line 1</option>
+          <option value="233rd St">233rd St  - Line 43587</option>
+          <option value="238th St">238th St  - Line 1</option>
+          <option value="23rd St">23rd St  - Line 43497</option>
+          <option value="23rd St">23rd St  - Line 4-6-6 Express</option>
+          <option value="23rd St">23rd St  - Line A-C-E</option>
+          <option value="23rd St">23rd St  - Line F-M</option>
+          <option value="23rd St">23rd St  - Line N-Q-R-W</option>
+          <option value="25th Ave">25th Ave  - Line D</option>
+          <option value="25th St">25th St  - Line D-N-R</option>
+          <option value="28th St">28th St  - Line 43497</option>
+          <option value="28th St">28th St  - Line 4-6-6 Express</option>
+          <option value="28th St">28th St  - Line N-Q-R-W</option>
+          <option value="30th Ave">30th Ave  - Line N-W</option>
+          <option value="33rd St">33rd St  - Line 7</option>
+          <option value="33rd St">33rd St  - Line 4-6-6 Express</option>
+          <option value="34th St - Hudson Yards">34th St - Hudson Yards  - Line 7-7 Express</option>
+          <option value="34th St - Penn Station">34th St - Penn Station  - Line 37653</option>
+          <option value="34th St - Penn Station">34th St - Penn Station  - Line A-C-E</option>
+          <option value="36th Ave">36th Ave  - Line N-W</option>
+          <option value="36th St">36th St  - Line D-N-R</option>
+          <option value="36th St">36th St  - Line E-M-R</option>
+          <option value="39th Ave">39th Ave  - Line N-W</option>
+          <option value="3rd Ave">3rd Ave  - Line L</option>
+          <option value="3rd Ave - 138th St">3rd Ave - 138th St  - Line 6-6 Express</option>
+          <option value="3rd Ave - 149th St">3rd Ave - 149th St  - Line 43587</option>
+          <option value="40th St">40th St  - Line 7</option>
+          <option value="42nd St - Bryant Pk">42nd St - Bryant Pk  - Line B-D-F-M</option>
+          <option value="42nd St - Port Authority Bus Term">42nd St - Port Authority Bus Term  - Line A-C-E</option>
+          <option value="45th St">45th St  - Line N-R</option>
+          <option value="46th St">46th St  - Line 7</option>
+          <option value="46th St">46th St  - Line E-M-R</option>
+          <option value="47th-50th Sts - Rockefeller Ctr">47th-50th Sts - Rockefeller Ctr  - Line B-D-F-M</option>
+          <option value="49th St">49th St  - Line N-Q-R-W</option>
+          <option value="4th Av - 9th St">4th Av - 9th St  - Line D-N-R</option>
+          <option value="4th Av - 9th St">4th Av - 9th St  - Line F-G</option>
+          <option value="50th St">50th St  - Line 43497</option>
+          <option value="50th St">50th St  - Line A-C-E</option>
+          <option value="50th St">50th St  - Line D</option>
+          <option value="51st St">51st St  - Line 4-6-6 Express</option>
+          <option value="52nd St">52nd St  - Line 7</option>
+          <option value="53rd St">53rd St  - Line N-R</option>
+          <option value="55th St">55th St  - Line D</option>
+          <option value="57th St">57th St  - Line F</option>
+          <option value="57th St">57th St  - Line N-Q-R-W</option>
+          <option value="59th St">59th St  - Line N-R</option>
+          <option value="59th St - Columbus Circle">59th St - Columbus Circle  - Line 43497</option>
+          <option value="59th St - Columbus Circle">59th St - Columbus Circle  - Line A-B-C-D</option>
+          <option value="5th Ave - 53rd St">5th Ave - 53rd St  - Line E-M</option>
+          <option value="5th Ave - 59th St">5th Ave - 59th St  - Line N-R-W</option>
+          <option value="5th Ave - Bryant Pk">5th Ave - Bryant Pk  - Line 7-7 Express</option>
+          <option value="62nd St">62nd St  - Line D</option>
+          <option value="63rd Dr - Rego Park">63rd Dr - Rego Park  - Line E-M-R</option>
+          <option value="65th St">65th St  - Line E-M-R</option>
+          <option value="66th St - Lincoln Ctr">66th St - Lincoln Ctr  - Line 43497</option>
+          <option value="67th Ave">67th Ave  - Line E-M-R</option>
+          <option value="68th St - Hunter College">68th St - Hunter College  - Line 4-6-6 Express</option>
+          <option value="69th St">69th St  - Line 7</option>
+          <option value="6th Ave">6th Ave  - Line L</option>
+          <option value="71st St">71st St  - Line D</option>
+          <option value="72nd St">72nd St  - Line 37653</option>
+          <option value="72nd St">72nd St  - Line A-B-C</option>
+          <option value="72nd St">72nd St  - Line Q</option>
+          <option value="74th St - Broadway">74th St - Broadway  - Line 7</option>
+          <option value="75th Ave">75th Ave  - Line E-F</option>
+          <option value="75th St - Eldert Ln">75th St - Eldert Ln  - Line J-Z</option>
+          <option value="77th St">77th St  - Line 4-6-6 Express</option>
+          <option value="77th St">77th St  - Line R</option>
+          <option value="79th St">79th St  - Line 43497</option>
+          <option value="79th St">79th St  - Line D</option>
+          <option value="7th Ave">7th Ave  - Line B-D-E</option>
+          <option value="7th Ave">7th Ave  - Line B-Q</option>
+          <option value="7th Ave">7th Ave  - Line F-G</option>
+          <option value="80th St">80th St  - Line A-S</option>
+          <option value="81st St">81st St  - Line A-B-C</option>
+          <option value="82nd St - Jackson Hts">82nd St - Jackson Hts  - Line 7</option>
+          <option value="85th St - Forest Pky">85th St - Forest Pky  - Line J</option>
+          <option value="86th St">86th St  - Line 43497</option>
+          <option value="86th St">86th St  - Line 4-5-6-6 Express</option>
+          <option value="86th St">86th St  - Line A-B-C</option>
+          <option value="86th St">86th St  - Line Q</option>
+          <option value="86th St">86th St  - Line R</option>
+          <option value="88th St">88th St  - Line A-S</option>
+          <option value="8th Ave">8th Ave  - Line L</option>
+          <option value="8th Ave">8th Ave  - Line N</option>
+          <option value="8th St - NYU">8th St - NYU  - Line N-Q-R-W</option>
+          <option value="90th St - Elmhurst Av">90th St - Elmhurst Av  - Line 7</option>
+          <option value="96th St">96th St  - Line 37653</option>
+          <option value="96th St">96th St  - Line 4-6-6 Express</option>
+          <option value="96th St">96th St  - Line A-B-C</option>
+          <option value="96th St">96th St  - Line Q</option>
+          <option value="9th Ave">9th Ave  - Line D</option>
+          <option value="Alabama Ave">Alabama Ave  - Line J</option>
+          <option value="Allerton Ave">Allerton Ave  - Line 43587</option>
+          <option value="Aqueduct - North Conduit Av">Aqueduct - North Conduit Av  - Line A</option>
+          <option value="Aqueduct Racetrack">Aqueduct Racetrack  - Line A</option>
+          <option value="Astor Pl">Astor Pl  - Line 4-6-6 Express</option>
+          <option value="Astoria - Ditmars Blvd">Astoria - Ditmars Blvd  - Line N-W</option>
+          <option value="Astoria Blvd">Astoria Blvd  - Line N-W</option>
+          <option value="Atlantic Av - Barclay's Center">Atlantic Av - Barclay's Center  - Line 2-3-4-5</option>
+          <option value="Atlantic Av - Barclay's Center">Atlantic Av - Barclay's Center  - Line B-Q</option>
+          <option value="Atlantic Av - Barclay's Center">Atlantic Av - Barclay's Center  - Line D-N-Q-R</option>
+          <option value="Atlantic Ave">Atlantic Ave  - Line L</option>
+          <option value="Ave H">Ave H  - Line Q</option>
+          <option value="Ave I">Ave I  - Line F</option>
+          <option value="Ave J">Ave J  - Line Q</option>
+          <option value="Ave M">Ave M  - Line Q</option>
+          <option value="Ave N">Ave N  - Line F</option>
+          <option value="Ave P">Ave P  - Line F</option>
+          <option value="Ave U">Ave U  - Line F</option>
+          <option value="Ave U">Ave U  - Line N</option>
+          <option value="Ave U">Ave U  - Line Q</option>
+          <option value="Ave X">Ave X  - Line F</option>
+          <option value="Bay 50th St">Bay 50th St  - Line D</option>
+          <option value="Bay Pky">Bay Pky  - Line D</option>
+          <option value="Bay Pky">Bay Pky  - Line F</option>
+          <option value="Bay Pky">Bay Pky  - Line N</option>
+          <option value="Bay Ridge - 95th St">Bay Ridge - 95th St  - Line R</option>
+          <option value="Bay Ridge Ave">Bay Ridge Ave  - Line R</option>
+          <option value="Baychester Ave">Baychester Ave  - Line 5</option>
+          <option value="Beach 105th St">Beach 105th St  - Line A-S</option>
+          <option value="Beach 25th St">Beach 25th St  - Line A</option>
+          <option value="Beach 36th St">Beach 36th St  - Line A</option>
+          <option value="Beach 44th St">Beach 44th St  - Line A</option>
+          <option value="Beach 60th St">Beach 60th St  - Line A</option>
+          <option value="Beach 67th St">Beach 67th St  - Line A</option>
+          <option value="Beach 90th St">Beach 90th St  - Line A-S</option>
+          <option value="Beach 98th St">Beach 98th St  - Line A-S</option>
+          <option value="Bedford - Nostrand Aves">Bedford - Nostrand Aves  - Line G</option>
+          <option value="Bedford Ave">Bedford Ave  - Line L</option>
+          <option value="Bedford Park Blvd">Bedford Park Blvd  - Line B-D</option>
+          <option value="Bedford Park Blvd - Lehman College">Bedford Park Blvd - Lehman College  - Line 4</option>
+          <option value="Bergen St">Bergen St  - Line 38048</option>
+          <option value="Bergen St">Bergen St  - Line F-G</option>
+          <option value="Beverly Rd">Beverly Rd  - Line 43587</option>
+          <option value="Beverly Rd">Beverly Rd  - Line Q</option>
+          <option value="Bleecker St">Bleecker St  - Line 4-6-6 Express</option>
+          <option value="Borough Hall">Borough Hall  - Line 43526</option>
+          <option value="Borough Hall">Borough Hall  - Line 43589</option>
+          <option value="Botanic Garden">Botanic Garden  - Line S</option>
+          <option value="Bowery">Bowery  - Line J-Z</option>
+          <option value="Bowling Green">Bowling Green  - Line 43589</option>
+          <option value="Briarwood - Van Wyck Blvd">Briarwood - Van Wyck Blvd  - Line E-F</option>
+          <option value="Brighton Beach">Brighton Beach  - Line B-Q</option>
+          <option value="Broad Channel">Broad Channel  - Line A-S</option>
+          <option value="Broad St">Broad St  - Line J-Z</option>
+          <option value="Broadway">Broadway  - Line G</option>
+          <option value="Broadway">Broadway  - Line N-W</option>
+          <option value="Broadway - Lafayette St">Broadway - Lafayette St  - Line B-D-F-M</option>
+          <option value="Broadway Junction">Broadway Junction  - Line A-C</option>
+          <option value="Broadway Junction">Broadway Junction  - Line J-Z</option>
+          <option value="Broadway Junction">Broadway Junction  - Line L</option>
+          <option value="Bronx Park East">Bronx Park East  - Line 43587</option>
+          <option value="Brook Ave">Brook Ave  - Line 6</option>
+          <option value="Brooklyn Bridge - City Hall">Brooklyn Bridge - City Hall  - Line 4-5-6-6 Express</option>
+          <option value="Brooklyn College - Flatbush Ave">Brooklyn College - Flatbush Ave  - Line 43587</option>
+          <option value="Buhre Ave">Buhre Ave  - Line 6-6 Express</option>
+          <option value="Burke Ave">Burke Ave  - Line 43587</option>
+          <option value="Burnside Ave">Burnside Ave  - Line 4</option>
+          <option value="Bushwick - Aberdeen">Bushwick - Aberdeen  - Line L</option>
+          <option value="Canal St">Canal St  - Line 43497</option>
+          <option value="Canal St">Canal St  - Line 4-6-6 Express</option>
+          <option value="Canal St">Canal St  - Line J-Z</option>
+          <option value="Canal St">Canal St  - Line N-Q</option>
+          <option value="Canal St">Canal St  - Line R-W</option>
+          <option value="Canal St - Holland Tunnel">Canal St - Holland Tunnel  - Line A-C-E</option>
+          <option value="Canarsie - Rockaway Pkwy">Canarsie - Rockaway Pkwy  - Line L</option>
+          <option value="Carroll St">Carroll St  - Line F-G</option>
+          <option value="Castle Hill Ave">Castle Hill Ave  - Line 6-6 Express</option>
+          <option value="Cathedral Pkwy (110th St)">Cathedral Pkwy (110th St)  - Line 1</option>
+          <option value="Cathedral Pkwy (110th St)">Cathedral Pkwy (110th St)  - Line A-B-C</option>
+          <option value="Central Ave">Central Ave  - Line M</option>
+          <option value="Central Park North (110th St)">Central Park North (110th St)  - Line 43526</option>
+          <option value="Chambers St">Chambers St  - Line 37653</option>
+          <option value="Chambers St">Chambers St  - Line A-C</option>
+          <option value="Chambers St">Chambers St  - Line J-Z</option>
+          <option value="Chauncey St">Chauncey St  - Line J-Z</option>
+          <option value="Christopher St - Sheridan Sq">Christopher St - Sheridan Sq  - Line 43497</option>
+          <option value="Church Ave">Church Ave  - Line 43587</option>
+          <option value="Church Ave">Church Ave  - Line B-Q</option>
+          <option value="Church Ave">Church Ave  - Line F-G</option>
+          <option value="City Hall">City Hall  - Line R-W</option>
+          <option value="Clark St">Clark St  - Line 43526</option>
+          <option value="Classon Ave">Classon Ave  - Line G</option>
+          <option value="Cleveland St">Cleveland St  - Line J</option>
+          <option value="Clinton - Washington Aves">Clinton - Washington Aves  - Line A-C</option>
+          <option value="Clinton - Washington Aves">Clinton - Washington Aves  - Line G</option>
+          <option value="Coney Island - Stillwell Av">Coney Island - Stillwell Av  - Line D-F-N-Q</option>
+          <option value="Cortelyou Rd">Cortelyou Rd  - Line Q</option>
+          <option value="Cortlandt St">Cortlandt St  - Line 1</option>
+          <option value="Cortlandt St">Cortlandt St  - Line R-W</option>
+          <option value="Court Sq">Court Sq  - Line 7-7 Express</option>
+          <option value="Court Sq - 23rd St">Court Sq - 23rd St  - Line E-M</option>
+          <option value="Court St">Court St  - Line N-R</option>
+          <option value="Crescent St">Crescent St  - Line J-Z</option>
+          <option value="Crown Hts - Utica Ave">Crown Hts - Utica Ave  - Line 43558</option>
+          <option value="Cypress Ave">Cypress Ave  - Line 6</option>
+          <option value="Cypress Hills">Cypress Hills  - Line J</option>
+          <option value="DeKalb Ave">DeKalb Ave  - Line B-D-N-Q-R</option>
+          <option value="DeKalb Ave">DeKalb Ave  - Line L</option>
+          <option value="Delancey St - Essex St">Delancey St - Essex St  - Line F</option>
+          <option value="Delancey St - Essex St">Delancey St - Essex St  - Line J-M-Z</option>
+          <option value="Ditmas Ave">Ditmas Ave  - Line F</option>
+          <option value="Dyckman St">Dyckman St  - Line 1</option>
+          <option value="Dyckman St">Dyckman St  - Line A</option>
+          <option value="E 105th St">E 105th St  - Line L</option>
+          <option value="E 143rd St - St Mary's St">E 143rd St - St Mary's St  - Line 6</option>
+          <option value="E 149th St">E 149th St  - Line 6</option>
+          <option value="E 180th St">E 180th St  - Line 43587</option>
+          <option value="East Broadway">East Broadway  - Line F</option>
+          <option value="Eastchester - Dyre Ave">Eastchester - Dyre Ave  - Line 5</option>
+          <option value="Eastern Pkwy - Bklyn Museum">Eastern Pkwy - Bklyn Museum  - Line 38048</option>
+          <option value="Elder Ave">Elder Ave  - Line 6</option>
+          <option value="Elmhurst Ave">Elmhurst Ave  - Line E-M-R</option>
+          <option value="Euclid Ave">Euclid Ave  - Line A-C-S</option>
+          <option value="Far Rockaway - Mott Ave">Far Rockaway - Mott Ave  - Line A</option>
+          <option value="Flushing - Main St">Flushing - Main St  - Line 7-7 Express</option>
+          <option value="Flushing Ave">Flushing Ave  - Line G</option>
+          <option value="Flushing Ave">Flushing Ave  - Line J-M</option>
+          <option value="Fordham Rd">Fordham Rd  - Line 4</option>
+          <option value="Fordham Rd">Fordham Rd  - Line B-D</option>
+          <option value="Forest Ave">Forest Ave  - Line M</option>
+          <option value="Forest Hills - 71st Av">Forest Hills - 71st Av  - Line E-F-M-R</option>
+          <option value="Franklin Ave">Franklin Ave  - Line 2-3-4-5</option>
+          <option value="Franklin Ave">Franklin Ave  - Line A-C</option>
+          <option value="Franklin Ave - Fulton St">Franklin Ave - Fulton St  - Line S</option>
+          <option value="Franklin St">Franklin St  - Line 43497</option>
+          <option value="Freeman St">Freeman St  - Line 43587</option>
+          <option value="Fresh Pond Rd">Fresh Pond Rd  - Line M</option>
+          <option value="Ft Hamilton Pkwy">Ft Hamilton Pkwy  - Line D</option>
+          <option value="Ft Hamilton Pkwy">Ft Hamilton Pkwy  - Line F-G</option>
+          <option value="Ft Hamilton Pkwy">Ft Hamilton Pkwy  - Line N</option>
+          <option value="Fulton St">Fulton St  - Line 43526</option>
+          <option value="Fulton St">Fulton St  - Line 43589</option>
+          <option value="Fulton St">Fulton St  - Line A-C</option>
+          <option value="Fulton St">Fulton St  - Line G</option>
+          <option value="Fulton St">Fulton St  - Line J-Z</option>
+          <option value="Gates Ave">Gates Ave  - Line J-Z</option>
+          <option value="Graham Ave">Graham Ave  - Line L</option>
+          <option value="Grand Army Plaza">Grand Army Plaza  - Line 38048</option>
+          <option value="Grand Ave - Newtown">Grand Ave - Newtown  - Line E-M-R</option>
+          <option value="Grand Central - 42nd St">Grand Central - 42nd St  - Line 4-5-6-6 Express</option>
+          <option value="Grand Central - 42nd St">Grand Central - 42nd St  - Line 7-7 Express</option>
+          <option value="Grand Central - 42nd St">Grand Central - 42nd St  - Line S</option>
+          <option value="Grand St">Grand St  - Line B-D</option>
+          <option value="Grand St">Grand St  - Line L</option>
+          <option value="Grant Ave">Grant Ave  - Line A-S</option>
+          <option value="Gravesend - 86th St">Gravesend - 86th St  - Line N</option>
+          <option value="Greenpoint Ave">Greenpoint Ave  - Line G</option>
+          <option value="Gun Hill Rd">Gun Hill Rd  - Line 5</option>
+          <option value="Gun Hill Rd">Gun Hill Rd  - Line 43587</option>
+          <option value="Halsey St">Halsey St  - Line J</option>
+          <option value="Halsey St">Halsey St  - Line L</option>
+          <option value="Harlem - 148 St">Harlem - 148 St  - Line 3</option>
+          <option value="Herald Sq - 34th St">Herald Sq - 34th St  - Line B-D-F-M</option>
+          <option value="Herald Sq - 34th St">Herald Sq - 34th St  - Line N-Q-R-W</option>
+          <option value="Hewes St">Hewes St  - Line J-M</option>
+          <option value="High St">High St  - Line A-C</option>
+          <option value="Houston St">Houston St  - Line 43497</option>
+          <option value="Howard Beach - JFK Airport">Howard Beach - JFK Airport  - Line A</option>
+          <option value="Hoyt - Schermerhorn Sts">Hoyt - Schermerhorn Sts  - Line A-C-G</option>
+          <option value="Hoyt St">Hoyt St  - Line 43526</option>
+          <option value="Hunters Point Ave">Hunters Point Ave  - Line 7-7 Express</option>
+          <option value="Hunts Point Ave">Hunts Point Ave  - Line 6-6 Express</option>
+          <option value="Intervale Ave">Intervale Ave  - Line 43587</option>
+          <option value="Inwood - 207th St">Inwood - 207th St  - Line A</option>
+          <option value="Jackson Ave">Jackson Ave  - Line 43587</option>
+          <option value="Jackson Hts - Roosevelt Av">Jackson Hts - Roosevelt Av  - Line E-F-M-R</option>
+          <option value="Jamaica - 179th St">Jamaica - 179th St  - Line F</option>
+          <option value="Jamaica - Van Wyck">Jamaica - Van Wyck  - Line E</option>
+          <option value="Jamaica Ctr - Parsons / Archer">Jamaica Ctr - Parsons / Archer  - Line E-J-Z</option>
+          <option value="Jay St - MetroTech">Jay St - MetroTech  - Line A-C-F</option>
+          <option value="Jay St - MetroTech">Jay St - MetroTech  - Line N-R</option>
+          <option value="Jefferson St">Jefferson St  - Line L</option>
+          <option value="Junction Blvd">Junction Blvd  - Line 7-7 Express</option>
+          <option value="Junius St">Junius St  - Line 43558</option>
+          <option value="Kew Gardens - Union Tpke">Kew Gardens - Union Tpke  - Line E-F</option>
+          <option value="Kings Hwy">Kings Hwy  - Line B-Q</option>
+          <option value="Kings Hwy">Kings Hwy  - Line F</option>
+          <option value="Kings Hwy">Kings Hwy  - Line N</option>
+          <option value="Kingsbridge Rd">Kingsbridge Rd  - Line 4</option>
+          <option value="Kingsbridge Rd">Kingsbridge Rd  - Line B-D</option>
+          <option value="Kingston - Throop Aves">Kingston - Throop Aves  - Line A-C</option>
+          <option value="Kingston Ave">Kingston Ave  - Line 43558</option>
+          <option value="Knickerbocker Ave">Knickerbocker Ave  - Line M</option>
+          <option value="Kosciuszko St">Kosciuszko St  - Line J</option>
+          <option value="Lafayette Ave">Lafayette Ave  - Line A-C</option>
+          <option value="Lexington Ave - 53rd St">Lexington Ave - 53rd St  - Line E-M</option>
+          <option value="Lexington Ave - 59th St">Lexington Ave - 59th St  - Line 4-5-6-6 Express</option>
+          <option value="Lexington Ave - 59th St">Lexington Ave - 59th St  - Line N-R-W</option>
+          <option value="Lexington Ave - 63rd St">Lexington Ave - 63rd St  - Line F-Q</option>
+          <option value="Liberty Ave">Liberty Ave  - Line A-C</option>
+          <option value="Livonia Ave">Livonia Ave  - Line L</option>
+          <option value="Long Island City - Court Sq">Long Island City - Court Sq  - Line G</option>
+          <option value="Longwood Ave">Longwood Ave  - Line 6</option>
+          <option value="Lorimer St">Lorimer St  - Line J-M</option>
+          <option value="Lorimer St">Lorimer St  - Line L</option>
+          <option value="Lower East Side - 2nd Ave">Lower East Side - 2nd Ave  - Line F</option>
+          <option value="Marble Hill - 225th St">Marble Hill - 225th St  - Line 1</option>
+          <option value="Marcy Ave">Marcy Ave  - Line J-M-Z</option>
+          <option value="Metropolitan Ave">Metropolitan Ave  - Line G</option>
+          <option value="Mets - Willets Point">Mets - Willets Point  - Line 7-7 Express</option>
+          <option value="Middle Village - Metropolitan Ave">Middle Village - Metropolitan Ave  - Line M</option>
+          <option value="Middletown Rd">Middletown Rd  - Line 6-6 Express</option>
+          <option value="Montrose Ave">Montrose Ave  - Line L</option>
+          <option value="Morgan Ave">Morgan Ave  - Line L</option>
+          <option value="Morris Park">Morris Park  - Line 5</option>
+          <option value="Morrison Av - Soundview">Morrison Av - Soundview  - Line 6</option>
+          <option value="Mosholu Pkwy">Mosholu Pkwy  - Line 4</option>
+          <option value="Mt Eden Ave">Mt Eden Ave  - Line 4</option>
+          <option value="Myrtle - Wyckoff Aves">Myrtle - Wyckoff Aves  - Line L</option>
+          <option value="Myrtle - Wyckoff Aves">Myrtle - Wyckoff Aves  - Line M</option>
+          <option value="Myrtle Ave">Myrtle Ave  - Line J-M-Z</option>
+          <option value="Myrtle-Willoughby Aves">Myrtle-Willoughby Aves  - Line G</option>
+          <option value="Nassau Ave">Nassau Ave  - Line G</option>
+          <option value="Neck Rd">Neck Rd  - Line Q</option>
+          <option value="Neptune Ave">Neptune Ave  - Line F</option>
+          <option value="Nereid Ave (238 St)">Nereid Ave (238 St)  - Line 43587</option>
+          <option value="Nevins St">Nevins St  - Line 2-3-4-5</option>
+          <option value="New Lots Ave">New Lots Ave  - Line 43558</option>
+          <option value="New Lots Ave">New Lots Ave  - Line L</option>
+          <option value="New Utrecht Ave">New Utrecht Ave  - Line N</option>
+          <option value="Newkirk Ave">Newkirk Ave  - Line 43587</option>
+          <option value="Newkirk Ave">Newkirk Ave  - Line B-Q</option>
+          <option value="Northern Blvd">Northern Blvd  - Line E-M-R</option>
+          <option value="Norwood - 205th St">Norwood - 205th St  - Line D</option>
+          <option value="Norwood Ave">Norwood Ave  - Line J-Z</option>
+          <option value="Nostrand Ave">Nostrand Ave  - Line 43558</option>
+          <option value="Nostrand Ave">Nostrand Ave  - Line A-C</option>
+          <option value="Ocean Pkwy">Ocean Pkwy  - Line Q</option>
+          <option value="Ozone Park - Lefferts Blvd">Ozone Park - Lefferts Blvd  - Line A-S</option>
+          <option value="Park Pl">Park Pl  - Line 43526</option>
+          <option value="Park Pl">Park Pl  - Line S</option>
+          <option value="Parkchester">Parkchester  - Line 6-6 Express</option>
+          <option value="Parkside Ave">Parkside Ave  - Line Q</option>
+          <option value="Parsons Blvd">Parsons Blvd  - Line F</option>
+          <option value="Pelham Bay Park">Pelham Bay Park  - Line 6-6 Express</option>
+          <option value="Pelham Pkwy">Pelham Pkwy  - Line 5</option>
+          <option value="Pelham Pkwy">Pelham Pkwy  - Line 43587</option>
+          <option value="Pennsylvania Ave">Pennsylvania Ave  - Line 43558</option>
+          <option value="President St">President St  - Line 43587</option>
+          <option value="Prince St">Prince St  - Line N-Q-R-W</option>
+          <option value="Prospect Ave">Prospect Ave  - Line 43587</option>
+          <option value="Prospect Ave">Prospect Ave  - Line D-N-R</option>
+          <option value="Prospect Park">Prospect Park  - Line B-Q-S</option>
+          <option value="Queens Plz">Queens Plz  - Line E-M-R</option>
+          <option value="Queensboro Plz">Queensboro Plz  - Line 7-7 Express-N-W</option>
+          <option value="Ralph Ave">Ralph Ave  - Line A-C</option>
+          <option value="Rector St">Rector St  - Line 1</option>
+          <option value="Rector St">Rector St  - Line R-W</option>
+          <option value="Rockaway Ave">Rockaway Ave  - Line 43558</option>
+          <option value="Rockaway Ave">Rockaway Ave  - Line A-C</option>
+          <option value="Rockaway Blvd">Rockaway Blvd  - Line A-S</option>
+          <option value="Rockaway Park - Beach 116 St">Rockaway Park - Beach 116 St  - Line A-S</option>
+          <option value="Roosevelt Island - Main St">Roosevelt Island - Main St  - Line F</option>
+          <option value="Saratoga Ave">Saratoga Ave  - Line 43558</option>
+          <option value="Seneca Ave">Seneca Ave  - Line M</option>
+          <option value="Sheepshead Bay">Sheepshead Bay  - Line B-Q</option>
+          <option value="Shepherd Ave">Shepherd Ave  - Line A-C</option>
+          <option value="Simpson St">Simpson St  - Line 43587</option>
+          <option value="Smith - 9th Sts">Smith - 9th Sts  - Line F-G</option>
+          <option value="South Ferry">South Ferry  - Line 1</option>
+          <option value="Spring St">Spring St  - Line 4-6-6 Express</option>
+          <option value="Spring St">Spring St  - Line A-C-E</option>
+          <option value="St Lawrence Ave">St Lawrence Ave  - Line 6</option>
+          <option value="Steinway St">Steinway St  - Line E-M-R</option>
+          <option value="Sterling St">Sterling St  - Line 43587</option>
+          <option value="Sutphin Blvd">Sutphin Blvd  - Line F</option>
+          <option value="Sutphin Blvd - Archer Av">Sutphin Blvd - Archer Av  - Line E-J-Z</option>
+          <option value="Sutter Ave">Sutter Ave  - Line L</option>
+          <option value="Sutter Ave - Rutland Road">Sutter Ave - Rutland Road  - Line 43558</option>
+          <option value="Times Sq - 42nd St">Times Sq - 42nd St  - Line 37653</option>
+          <option value="Times Sq - 42nd St">Times Sq - 42nd St  - Line 7-7 Express</option>
+          <option value="Times Sq - 42nd St">Times Sq - 42nd St  - Line N-Q-R-W</option>
+          <option value="Times Sq - 42nd St">Times Sq - 42nd St  - Line S</option>
+          <option value="Tremont Ave">Tremont Ave  - Line B-D</option>
+          <option value="Union Sq - 14th St">Union Sq - 14th St  - Line 4-5-6-6 Express</option>
+          <option value="Union Sq - 14th St">Union Sq - 14th St  - Line L</option>
+          <option value="Union Sq - 14th St">Union Sq - 14th St  - Line N-Q-R-W</option>
+          <option value="Union St">Union St  - Line D-N-R</option>
+          <option value="Utica Ave">Utica Ave  - Line A-C</option>
+          <option value="Van Cortlandt Park - 242nd St">Van Cortlandt Park - 242nd St  - Line 1</option>
+          <option value="Van Siclen Ave">Van Siclen Ave  - Line 43558</option>
+          <option value="Van Siclen Ave">Van Siclen Ave  - Line A-C</option>
+          <option value="Van Siclen Ave">Van Siclen Ave  - Line J-Z</option>
+          <option value="Vernon Blvd - Jackson Ave">Vernon Blvd - Jackson Ave  - Line 7-7 Express</option>
+          <option value="W 4th St - Washington Sq (Lower)">W 4th St - Washington Sq (Lower)  - Line B-D-F-M</option>
+          <option value="W 4th St - Washington Sq (Upper)">W 4th St - Washington Sq (Upper)  - Line A-C-E</option>
+          <option value="W 8th St - NY Aquarium">W 8th St - NY Aquarium  - Line F-Q</option>
+          <option value="Wakefield - 241st St">Wakefield - 241st St  - Line 2</option>
+          <option value="Wall St">Wall St  - Line 43526</option>
+          <option value="Wall St">Wall St  - Line 43589</option>
+          <option value="West Farms Sq - E Tremont Av">West Farms Sq - E Tremont Av  - Line 43587</option>
+          <option value="Westchester Sq - E Tremont Ave">Westchester Sq - E Tremont Ave  - Line 6-6 Express</option>
+          <option value="Whitehall St">Whitehall St  - Line R-W</option>
+          <option value="Whitlock Ave">Whitlock Ave  - Line 6</option>
+          <option value="Wilson Ave">Wilson Ave  - Line L</option>
+          <option value="Winthrop St">Winthrop St  - Line 43587</option>
+          <option value="Woodhaven Blvd">Woodhaven Blvd  - Line J-Z</option>
+          <option value="Woodhaven Blvd - Queens Mall">Woodhaven Blvd - Queens Mall  - Line E-M-R</option>
+          <option value="Woodlawn">Woodlawn  - Line 4</option>
+          <option value="Woodside - 61st St">Woodside - 61st St  - Line 7-7 Express</option>
+          <option value="World Trade Center">World Trade Center  - Line E</option>
+          <option value="York St">York St  - Line F</option>
+          <option value="Zerega Ave">Zerega Ave  - Line 6-6 Express</option>
+         
+          
+        </select>
+      </div>
+          <!--       footnote -->
+      <div class="footNote">
+        <p>
+          Source: <a href="https://glitch.com">Glitch</a>!
+        </p>
+      </div>
+      </div>
+    
+    
+    <!-- Load Leaflet library -->
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
+    
+    <!-- Load our JavaScript -->
+    <script src="./script.js"></script>
+    
+    <!-- Load Promises polyfill -->
+    <script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"></script>
+    
+    <!-- Load Fetch polyfill -->
+    <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@2.0.4/fetch.js"></script>
+    
+    <!-- import the Mustache library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.0/mustache.min.js"></script>
+ 
+
+    <!-- source -->
+    <div class="glitchButton" style="position:fixed;top:20px;right:20px;"></div>
+    <script src="https://button.glitch.me/button.js"></script>
+  </body>
+</html>
