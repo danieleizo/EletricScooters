@@ -1,0 +1,60 @@
+/* CSS files add styling rules to your content */
+
+body {
+  font-family: "Benton Sans", "Helvetica Neue", helvetica, arial, sans-serif;
+  margin: 2em;
+  font-family: 'IBM Plex Sans', sans-serif;
+}
+
+h1 {
+  font-style: italic;
+  color: #373fff;
+  
+}
+
+button {
+  background-color: #80FFCE;
+  border-width: 7px;
+  border-color: #80FFCE;
+  font-family: Courier;
+  font-size: 20px;
+  color:#919191;
+  width: 100%
+  
+}
+
+select {
+  border-width: 7px;
+  font-family: Courier;
+  color:#919191;
+  font-size: 15px;
+  width: 100%;
+  background-color: #ffcc5c;
+  border-color: #ffcc5c;
+  
+}
+
+#map {
+  float: right;
+  height: 90vh;
+  width: 75%;
+}
+
+.overlay {
+  position: relative;
+  top: 0;
+  left: 0;
+  padding: 15px;
+  background: white;
+  z-index: 10000;
+}
+
+.sideBar {
+  float: right;
+  width:25%
+  
+}
+
+.footNote {
+  position: absolute;
+}
